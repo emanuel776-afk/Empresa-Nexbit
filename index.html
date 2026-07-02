@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexbit - Assistência Técnica Profissional</title>
+    <meta name="description" content="Nexbit - Sistema de Assistência Técnica Profissional com Dashboard Inteligente">
+    <meta name="theme-color" content="#4A90E2">
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+    <div class="wrap">
+        <div class="logo-group">
+            <div class="logo-box">
+                <img src="4.png" alt="Logo Nexbit" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <span class="logo-fallback">NB</span>
+            </div>
+        </div>
+        <nav>
+            <a href="#dashboard" class="active">Dashboard</a>
+            <a href="#clientes">Clientes</a>
+            <a href="#equipamentos">Equipamentos</a>
+            <a href="#chamados">Chamados</a>
+            <a href="#diagnosticos">Diagnósticos</a>
+            <a href="#servicos">Serviços</a>
+            <a href="#ordemServico">Ordem de Serviço</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="pagina ativa">
+    <div class="wrap">
+        <h2>Dashboard</h2>
+        <p>Bem-vindo ao sistema Nexbit. O Dashboard reúne as principais informações da assistência técnica em um único lugar.</p>
+
+        <div class="stats" id="statsDashboard">
+            <div class="stat-card">
+                <span class="stat-numero" data-value="2847">0</span>
+                <span class="stat-label">Clientes Ativos</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-numero" data-value="542">0</span>
+                <span class="stat-label">Equipamentos em Manutenção</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-numero" data-value="1203">0</span>
+                <span class="stat-label">Chamados Processados</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-numero" data-value="98">0</span>
+                <span class="stat-label">% Satisfação</span>
+            </div>
+        </div>
+
+        <h3>Chamados Recentes</h3>
+        <div id="dashboardChamados" class="lista"></div>
+    </div>
+</section>
+
+<!-- CLIENTES -->
+<section id="clientes" class="pagina">
+    <div class="wrap">
+        <h2>Clientes</h2>
+
+        <form id="formCliente" class="formulario" onsubmit="return salvarCliente(event)">
+            <input type="hidden" id="clienteId">
+
+            <div class="campo">
+                <label>Nome</label>
+                <input type="text" id="clienteNome" placeholder="Nome do cliente" required>
+            </div>
+
+            <div class="campo">
+                <label>Telefone</label>
+                <input type="text" id="clienteTelefone" placeholder="(00) 00000-0000">
+            </div>
+
+            <div class="campo">
+                <label>E-mail</label>
+                <input type="email" id="clienteEmail" placeholder="cliente@email.com">
+            </div>
+
+            <div class="acoes-form">
+                <button type="submit" class="btn btn-primario">Salvar Cliente</button>
+                <button type="button" class="btn btn-secundario" onclick="cancelarEdicaoCliente()">Cancelar</button>
+            </div>
+        </form>
+
+        <div id="listaClientes" class="lista"></div>
+    </div>
+</section>
+
+<!-- EQUIPAMENTOS -->
+<section id="equipamentos" class="pagina">
+    <div class="wrap">
+        <h2>Equipamentos</h2>
+
+        <p>Neste módulo são cadastrados todos os equipamentos recebidos pela assistência técnica.</p>
+
+        <form id="formEquipamento" class="formulario" onsubmit="return salvarEquipamento(event)">
+            <input type="hidden" id="equipamentoId">
+
+            <div class="campo">
+                <label>Cliente</label>
+                <select id="equipamentoCliente" required>
+                    <option value="">Selecione um cliente</option>
+                </select>
+            </div>
+
+            <div class="campo">
+                <label>Tipo</label>
+                <input type="text" id="equipamentoTipo" placeholder="Notebook, PC, etc." required>
+            </div>
+
+            <div class="campo">
+                <label>Marca / Modelo</label>
+                <input type="text" id="equipamentoModelo" placeholder="Ex: Dell Inspiron 15">
+            </div>
+
+            <div class="campo">
+                <label>Número de série</label>
+                <input type="text" id="equipamentoSerie" placeholder="Número de série">
+            </div>
+
+            <div class="campo">
+                <label>Acessórios entregues</label>
+                <input type="text" id="equipamentoAcessorios" placeholder="Carregador, mouse, etc.">
+            </div>
+
+            <div class="campo">
+                <label>Estado do equipamento</label>
+                <textarea id="equipamentoEstado" placeholder="Descreva o estado físico na entrada"></textarea>
+            </div>
+
+            <div class="acoes-form">
+                <button type="submit" class="btn btn-primario">Salvar Equipamento</button>
+                <button type="button" class="btn btn-secundario" onclick="cancelarEdicaoEquipamento()">Cancelar</button>
+            </div>
+        </form>
+
+        <div id="listaEquipamentos" class="lista"></div>
+    </div>
+</section>
+
+<!-- CHAMADOS -->
+<section id="chamados" class="pagina">
+    <div class="wrap">
+        <h2>Chamados</h2>
+
+        <p>Os chamados representam as ordens de serviço da Nexbit. Aqui é possível abrir novos atendimentos.</p>
+
+        <form id="formChamado" class="formulario" onsubmit="return salvarChamado(event)">
+            <input type="hidden" id="chamadoId">
+
+            <div class="campo">
+                <label>Cliente</label>
+                <select id="chamadoCliente" required onchange="atualizarEquipamentosDoCliente()">
+                    <option value="">Selecione um cliente</option>
+                </select>
+            </div>
+
+            <div class="campo">
+                <label>Equipamento</label>
+                <select id="chamadoEquipamento">
+                    <option value="">Selecione um equipamento</option>
+                </select>
+            </div>
+
+            <div class="campo">
+                <label>Descrição do problema</label>
+                <textarea id="chamadoDescricao" placeholder="Descreva o problema relatado" required></textarea>
+            </div>
+
+            <div class="campo">
+                <label>Status</label>
+                <select id="chamadoStatus">
+                    <option value="Aberto">Aberto</option>
+                    <option value="Em andamento">Em andamento</option>
+                    <option value="Concluído">Concluído</option>
+                </select>
+            </div>
+
+            <div class="acoes-form">
+                <button type="submit" class="btn btn-primario">Abrir Chamado</button>
+                <button type="button" class="btn btn-secundario" onclick="cancelarEdicaoChamado()">Cancelar</button>
+            </div>
+        </form>
+
+        <div id="listaChamados" class="lista"></div>
+    </div>
+</section>
+
+<!-- DIAGNÓSTICOS -->
+<section id="diagnosticos" class="pagina">
+    <div class="wrap">
+        <h2>Diagnósticos</h2>
+
+        <p>O módulo de diagnósticos é utilizado para registrar os testes realizados pelos técnicos.</p>
+
+        <form id="formDiagnostico" class="formulario" onsubmit="return salvarDiagnostico(event)">
+            <input type="hidden" id="diagnosticoId">
+
+            <div class="campo">
+                <label>Chamado</label>
+                <select id="diagnosticoChamado" required>
+                    <option value="">Selecione um chamado</option>
+                </select>
+            </div>
+
+            <div class="campo">
+                <label>Testes realizados</label>
+                <textarea id="diagnosticoTestes" placeholder="Descreva os testes realizados" required></textarea>
+            </div>
+
+            <div class="campo">
+                <label>Causa do problema</label>
+                <textarea id="diagnosticoCausa" placeholder="Causa identificada"></textarea>
+            </div>
+
+            <div class="campo">
+                <label>Solução recomendada</label>
+                <textarea id="diagnosticoSolucao" placeholder="Solução recomendada"></textarea>
+            </div>
+
+            <div class="acoes-form">
+                <button type="submit" class="btn btn-primario">Salvar Diagnóstico</button>
+                <button type="button" class="btn btn-secundario" onclick="cancelarEdicaoDiagnostico()">Cancelar</button>
+            </div>
+        </form>
+
+        <div id="listaDiagnosticos" class="lista"></div>
+    </div>
+</section>
+
+<!-- SERVIÇOS -->
+<section id="servicos" class="pagina">
+    <div class="wrap">
+        <h2>Serviços</h2>
+
+        <p>Nesta área são registrados todos os serviços executados durante a manutenção do equipamento.</p>
+
+        <form id="formServico" class="formulario" onsubmit="return salvarServico(event)">
+            <input type="hidden" id="servicoId">
+
+            <div class="campo">
+                <label>Chamado</label>
+                <select id="servicoChamado" required>
+                    <option value="">Selecione um chamado</option>
+                </select>
+            </div>
+
+            <div class="campo">
+                <label>Tipo de serviço</label>
+                <input type="text" id="servicoTipo" placeholder="Ex: Formatação, limpeza..." required>
+            </div>
+
+            <div class="campo">
+                <label>Descrição</label>
+                <textarea id="servicoDescricao" placeholder="Detalhes do serviço executado"></textarea>
+            </div>
+
+            <div class="campo">
+                <label>Data</label>
+                <input type="date" id="servicoData">
+            </div>
+
+            <div class="acoes-form">
+                <button type="submit" class="btn btn-primario">Salvar Serviço</button>
+                <button type="button" class="btn btn-secundario" onclick="cancelarEdicaoServico()">Cancelar</button>
+            </div>
+        </form>
+
+        <div id="listaServicos" class="lista"></div>
+    </div>
+</section>
+
+<!-- ORDEM DE SERVIÇO -->
+<section id="ordemServico" class="pagina">
+    <div class="wrap">
+        <h2>Nova Ordem de Serviço</h2>
+
+        <form id="formOS" class="formulario" onsubmit="return salvarOrdenServico(event)">
+
+            <h3>Dados do Cliente</h3>
+            <div class="campo">
+                <label>Nome</label>
+                <input type="text" id="osClienteNome" required>
+            </div>
+            <div class="campo">
+                <label>CPF</label>
+                <input type="text" id="osClienteCPF">
+            </div>
+            <div class="campo">
+                <label>Telefone</label>
+                <input type="text" id="osClienteTelefone">
+            </div>
+            <div class="campo">
+                <label>E-mail</label>
+                <input type="email" id="osClienteEmail">
+            </div>
+            <div class="campo">
+                <label>Endereço</label>
+                <input type="text" id="osClienteEndereco">
+            </div>
+
+            <hr>
+
+            <h3>Equipamento</h3>
+            <div class="campo">
+                <label>Tipo</label>
+                <input type="text" id="osTipoEquipamento" placeholder="Notebook, Desktop, etc.">
+            </div>
+            <div class="campo">
+                <label>Marca</label>
+                <input type="text" id="osMarca">
+            </div>
+            <div class="campo">
+                <label>Modelo</label>
+                <input type="text" id="osModelo">
+            </div>
+            <div class="campo">
+                <label>Número de Série</label>
+                <input type="text" id="osSerie">
+            </div>
+            <div class="campo">
+                <label>Processador</label>
+                <input type="text" id="osProcessador">
+            </div>
+            <div class="campo">
+                <label>Memória RAM</label>
+                <input type="text" id="osRam">
+            </div>
+            <div class="campo">
+                <label>Armazenamento</label>
+                <input type="text" id="osArmazenamento">
+            </div>
+            <div class="campo">
+                <label>Sistema Operacional</label>
+                <input type="text" id="osSo">
+            </div>
+
+            <hr>
+
+            <h3>Acessórios Entregues</h3>
+            <div class="checkbox-group">
+                <label><input type="checkbox" name="acessorios" value="Fonte"> Fonte</label>
+                <label><input type="checkbox" name="acessorios" value="Mouse"> Mouse</label>
+                <label><input type="checkbox" name="acessorios" value="Teclado"> Teclado</label>
+                <label><input type="checkbox" name="acessorios" value="Carregador"> Carregador</label>
+                <label><input type="checkbox" name="acessorios" value="Cabo HDMI"> Cabo HDMI</label>
+                <label><input type="checkbox" name="acessorios" value="Cabo de Energia"> Cabo de Energia</label>
+                <label><input type="checkbox" name="acessorios" value="Bolsa"> Bolsa</label>
+                <label><input type="checkbox" name="acessorios" value="Outros"> Outros</label>
+            </div>
+
+            <hr>
+
+            <h3>Estado Físico</h3>
+            <div class="checkbox-group">
+                <label><input type="checkbox" name="estadoFisico" value="Tela Quebrada"> Tela Quebrada</label>
+                <label><input type="checkbox" name="estadoFisico" value="Carcaça Danificada"> Carcaça Danificada</label>
+                <label><input type="checkbox" name="estadoFisico" value="Tampa Riscada"> Tampa Riscada</label>
+                <label><input type="checkbox" name="estadoFisico" value="Oxidação"> Oxidação</label>
+                <label><input type="checkbox" name="estadoFisico" value="Sem Danos Visíveis"> Sem Danos Visíveis</label>
+            </div>
+            <div class="campo">
+                <label>Observações</label>
+                <textarea id="osObservacoes" rows="4"></textarea>
+            </div>
+
+            <hr>
+
+            <h3>Problema Relatado pelo Cliente</h3>
+            <div class="campo">
+                <textarea id="osProblemaRelatado" rows="6" placeholder="Descreva o problema informado pelo cliente..."></textarea>
+            </div>
+
+            <hr>
+
+            <h3>Diagnóstico Técnico</h3>
+            <div class="checkbox-group">
+                <label><input type="checkbox" name="diagnostico" value="SSD com Defeito"> SSD com Defeito</label>
+                <label><input type="checkbox" name="diagnostico" value="HD com Defeito"> HD com Defeito</label>
+                <label><input type="checkbox" name="diagnostico" value="Memória RAM"> Memória RAM</label>
+                <label><input type="checkbox" name="diagnostico" value="Fonte"> Fonte</label>
+                <label><input type="checkbox" name="diagnostico" value="Placa-mãe"> Placa-mãe</label>
+                <label><input type="checkbox" name="diagnostico" value="Processador"> Processador</label>
+                <label><input type="checkbox" name="diagnostico" value="Sistema Corrompido"> Sistema Corrompido</label>
+                <label><input type="checkbox" name="diagnostico" value="Vírus"> Vírus</label>
+                <label><input type="checkbox" name="diagnostico" value="Superaquecimento"> Superaquecimento</label>
+                <label><input type="checkbox" name="diagnostico" value="Outro"> Outro</label>
+            </div>
+            <div class="campo">
+                <label>Descrição do Diagnóstico</label>
+                <textarea id="osDescricaoDiagnostico" rows="5"></textarea>
+            </div>
+
+            <hr>
+
+            <h3>Testes Realizados</h3>
+            <div class="checkbox-group">
+                <label><input type="checkbox" name="testes" value="Boot"> Boot</label>
+                <label><input type="checkbox" name="testes" value="SSD"> SSD</label>
+                <label><input type="checkbox" name="testes" value="HD"> HD</label>
+                <label><input type="checkbox" name="testes" value="Memória RAM"> Memória RAM</label>
+                <label><input type="checkbox" name="testes" value="Fonte"> Fonte</label>
+                <label><input type="checkbox" name="testes" value="Drivers"> Drivers</label>
+                <label><input type="checkbox" name="testes" value="Backup"> Backup</label>
+                <label><input type="checkbox" name="testes" value="Temperatura"> Temperatura</label>
+            </div>
+
+            <hr>
+
+            <h3>Serviços Executados</h3>
+            <div class="checkbox-group">
+                <label><input type="checkbox" name="servicos" value="Formatação"> Formatação</label>
+                <label><input type="checkbox" name="servicos" value="Instalação do Windows"> Instalação do Windows</label>
+                <label><input type="checkbox" name="servicos" value="Drivers"> Drivers</label>
+                <label><input type="checkbox" name="servicos" value="Office"> Office</label>
+                <label><input type="checkbox" name="servicos" value="Limpeza Preventiva"> Limpeza Preventiva</label>
+                <label><input type="checkbox" name="servicos" value="Pasta Térmica"> Pasta Térmica</label>
+                <label><input type="checkbox" name="servicos" value="Upgrade SSD"> Upgrade SSD</label>
+                <label><input type="checkbox" name="servicos" value="Upgrade RAM"> Upgrade RAM</label>
+                <label><input type="checkbox" name="servicos" value="Remoção de Vírus"> Remoção de Vírus</label>
+                <label><input type="checkbox" name="servicos" value="Recuperação de Arquivos"> Recuperação de Arquivos</label>
+                <label><input type="checkbox" name="servicos" value="Atualização de BIOS"> Atualização de BIOS</label>
+                <label><input type="checkbox" name="servicos" value="Outro"> Outro</label>
+            </div>
+
+            <hr>
+
+            <h3>Peças Substituídas</h3>
+            <div class="campo">
+                <label>Descrição</label>
+                <textarea id="osPecasSubstituidas" rows="4"></textarea>
+            </div>
+
+            <hr>
+
+            <h3>Resultado Final</h3>
+            <div class="radio-group">
+                <label><input type="radio" name="resultado" value="Funcionando"> Funcionando</label>
+                <label><input type="radio" name="resultado" value="Funcionando Parcialmente"> Funcionando Parcialmente</label>
+                <label><input type="radio" name="resultado" value="Aguardando Peças"> Aguardando Peças</label>
+                <label><input type="radio" name="resultado" value="Sem Reparo"> Sem Reparo</label>
+                <label><input type="radio" name="resultado" value="Equipamento Devolvido"> Equipamento Devolvido</label>
+            </div>
+            <div class="campo">
+                <label>Observações Finais</label>
+                <textarea id="osObservacoesFinal" rows="4"></textarea>
+            </div>
+
+            <hr>
+
+            <h3>Garantia</h3>
+            <div class="campo">
+                <label>Dias de Garantia</label>
+                <input type="number" id="osDiasGarantia" value="90">
+            </div>
+
+            <hr>
+
+            <h3>Responsáveis</h3>
+            <div class="campo">
+                <label>Nome do Técnico</label>
+                <input type="text" id="osNomeTecnico">
+            </div>
+            <div class="campo">
+                <label>Nome do Cliente</label>
+                <input type="text" id="osNomeCliente">
+            </div>
+
+            <div class="acoes-form">
+                <button class="btn btn-primario" type="submit">Salvar Ordem de Serviço</button>
+                <button class="btn btn-secundario" type="reset">Limpar Formulário</button>
+            </div>
+        </form>
+
+        <div id="listaOS" class="lista"></div>
+    </div>
+</section>
+
+</main>
+
+<!-- BOTÃO FLUTUANTE WHATSAPP -->
+<div class="whatsapp-container">
+    <div class="whatsapp-menu" id="whatsappMenu">
+        <a href="https://wa.me/5533981481008?text=Olá%20Nexbit%21%20👋%20Preciso%20de%20suporte%20técnico%20urgente%21" 
+           class="whatsapp-opcao" 
+           target="_blank" 
+           rel="noopener noreferrer"
+           title="Clique para conversar via WhatsApp">
+            <span class="whatsapp-opcao-texto">🚀 Suporte Técnico</span>
+        </a>
+        <a href="https://wa.me/5533981481008?text=Olá%20Nexbit%21%20💼%20Gostaria%20de%20solicitar%20um%20orçamento%20para%20seus%20serviços." 
+           class="whatsapp-opcao" 
+           target="_blank" 
+           rel="noopener noreferrer"
+           title="Clique para solicitar orçamento">
+            <span class="whatsapp-opcao-texto">💰 Orçamento</span>
+        </a>
+        <a href="https://wa.me/5533981481008?text=Olá%20Nexbit%21%20📞%20Gostaria%20de%20entrar%20em%20contato%20com%20vocês." 
+           class="whatsapp-opcao" 
+           target="_blank" 
+           rel="noopener noreferrer"
+           title="Clique para enviar mensagem">
+            <span class="whatsapp-opcao-texto">💬 Contato</span>
+        </a>
+    </div>
+    <button class="whatsapp-botao" id="whatsappBotao" title="Abrir menu WhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-4.949 1.262c-1.524.756-2.76 1.793-3.68 3.02C2.636 8.04 2.1 9.38 2.1 10.88c0 2.442.673 4.85 1.992 6.923l-2.122 7.745 7.945-2.118c1.95 1.238 4.232 1.892 6.57 1.892 5.436 0 10.064-3.794 11.313-8.98.738-3.099.38-6.365-1.008-9.276-1.388-2.91-3.701-5.207-6.605-6.595-2.904-1.388-6.17-1.746-9.313-1.008zm7.95 18.861c-2.125 0-4.197-.533-6.032-1.533l-.432-.254-4.481 1.266.777-2.834-.182-.29c-1.52-2.423-2.322-5.183-2.322-8.037 0-8.568 6.996-15.564 15.564-15.564 4.148 0 8.048 1.618 10.972 4.542 2.924 2.924 4.542 6.824 4.542 10.972 0 8.568-6.996 15.564-15.564 15.564z"/>
+        </svg>
+    </button>
+</div>
+<script src="script.js"></script>
+
+</body>
+</html>
